@@ -59,22 +59,27 @@ function buildMetadata(sample) {
     
   });
 };
-
+//Build Bar Chart
+//pull from overall object of data, and filter by sample selected in the dropdown bar
 function buildCharts(sample){
   d3.json("samples.json").then((data) => {
     var samples = data.samples;
     var resultArray = samples.filter(sampleObj => sampleObj.id == sample);
+    //must filter the samples array by the first column ('id') so we only pull corresponding
+    //data that has that id
     var result = resultArray[0];
     
     var otuIds = result.otu_ids
     var otuLabel = result.otu_labels
     var sampleValues = result.sample_values
   
-
+//only want to show top ten samples found in subject to create simple, informative visual
+//slice top 10 of sampleValues, and otuIds--remember* must also slice otuLabels to hover 
+//all 3 categories, though not in the same key value pair, are aligned throughout the data in their array
     toptenValues = (sampleValues).slice(0,10).reverse();
     toptenOTUs = otuIds.slice(0,10).map(OTU => `OTU ${OTU}`).reverse();
   
-  
+  //format data to fit the graph how you want it 
   var trace1 = {
     x: toptenValues,
     y: toptenOTUs,
@@ -99,6 +104,8 @@ function buildCharts(sample){
 // Render the plot to the div tag with id "plot"
   Plotly.newPlot("bar", data, layout);
 
+  // Create a Bubble Chart 
+  // Create new x/y values, markers, and size making things equal to the data. 
   var trace2 = {
     x: otuIds,
     y: sampleValues,
@@ -110,8 +117,12 @@ function buildCharts(sample){
       colorscale: 'Earth'
     }
   };
-  
+
+  //must put data and labels inside an array 
+
   data2 = [trace2];  
+
+  //call function to graph bubble chart - must be the same as call in HTML code
   Plotly.newPlot('bubble', data2);
 
 })
